@@ -1,52 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom/client';
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom/client";
 
 function App() {
-  const [health, setHealth] = useState('checking...');
+  const [health, setHealth] = useState("Checking...");
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    async function fetchHealth() {
+    async function loadData() {
       try {
-        const res = await fetch('/api/health');
-        const data = await res.json();
-        setHealth(data.status || 'ok');
+        const healthRes = await fetch("/api/health");
+        const healthData = await healthRes.json();
+        setHealth(healthData.status);
+
+        const productRes = await fetch("/api/products");
+        const productData = await productRes.json();
+        setProducts(productData.products || []);
       } catch (err) {
-        setError(err.message || 'failed to connect');
-        setHealth('offline');
+        setError(err.message);
+        setHealth("Offline");
       }
     }
 
-    async function fetchProducts() {
-      try {
-        const res = await fetch('/api/products');
-        const data = await res.json();
-        setProducts(data.products || []);
-      } catch (err) {
-        setError(err.message || 'failed to load products');
-      }
-    }
-
-    fetchHealth();
-    fetchProducts();
+    loadData();
   }, []);
 
   return (
-    <div style={{ fontFamily: 'Inter, sans-serif', margin: '2rem' }}>
-      <h1>NovaCart React</h1>
-      <p>Backend health: <strong>{health}</strong></p>
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      <section>
-        <h2>Products</h2>
-        {products.length === 0 ? (
-          <p>No products available yet.</p>
-        ) : (
-          <ul>{products.map((item, index) => <li key={index}>{item.name || item.title || 'Unnamed product'}</li>)}</ul>
-        )}
-      </section>
+    <div style={{ padding: "30px", fontFamily: "Arial" }}>
+      <h1>NovaCart</h1>
+
+      <h3>Backend: {health}</h3>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <h2>Products</h2>
+
+      {products.length === 0 ? (
+        <p>No products available.</p>
+      ) : (
+        <ul>
+          {products.map((p, i) => (
+            <li key={i}>{p.name || p.title}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
