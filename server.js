@@ -10,8 +10,8 @@ app.use(express.json());
 
 const PORT = config.port || 5000;
 
-// 1. Set your MongoDB connection string directly here to bypass environment file issues
-let mongoUri = "mongodb://ggolanakondaharish_db_user:oFoG0U88v8LkvCdQ@cluster0-shard-00-00.h0e89fn.mongodb.net:27017,cluster0-shard-00-01.h0e89fn.mongodb.net:27017,cluster0-shard-00-02.h0e89fn.mongodb.net:27017/NovaCart?ssl=true&replicaSet=atlas-d7w8it-shard-0&authSource=admin&retryWrites=true&w=majority";
+
+
 
 // 2. Fallback check (only if the string above is empty)
 if (!mongoUri) {
