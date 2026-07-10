@@ -1,56 +1,70 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const config = require('./config');
-require('dotenv').config(); // This line reads the .env file
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
+
+const config = require("./config");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-const PORT = config.port || 5000;
+const PORT = process.env.PORT || config.port || 5000;
 
-
-
-
-// 2. Fallback check (only if the string above is empty)
-if (!mongoUri) {
-  mongoUri = process.env.mongoUri || process.env.MONGO_URI;
-}
+// MongoDB URI
+let mongoUri = process.env.MONGO_URI || process.env.mongoUri || "";
 
 if (!mongoUri && config.mongoHost) {
-  const hostPart = config.mongoHost;
-  const isAtlas = hostPart.includes('.mongodb.net') || hostPart.includes('mongodb.net');
+  const isAtlas =
+    config.mongoHost.includes("mongodb.net") ||
+    config.mongoHost.includes(".mongodb.net");
+
   if (isAtlas) {
-    mongoUri = `mongodb+srv://${encodeURIComponent(config.mongoUser)}:${encodeURIComponent(config.mongoPass)}@${hostPart}/${config.mongoDbName}?retryWrites=true&w=majority`;
+    mongoUri = `mongodb+srv://${encodeURIComponent(
+      config.mongoUser
+    )}:${encodeURIComponent(config.mongoPass)}@${
+      config.mongoHost
+    }/${config.mongoDbName}?retryWrites=true&w=majority`;
   } else {
-    mongoUri = `mongodb://${encodeURIComponent(config.mongoUser)}:${encodeURIComponent(config.mongoPass)}@${hostPart}/${config.mongoDbName}`;
+    mongoUri = `mongodb://${encodeURIComponent(
+      config.mongoUser
+    )}:${encodeURIComponent(config.mongoPass)}@${
+      config.mongoHost
+    }/${config.mongoDbName}`;
   }
 }
 
-// 3. Connect to MongoDB
+// MongoDB Connection
 if (mongoUri) {
-  mongoose.connect(mongoUri)
-    .then(() => console.log('MongoDB connected successfully.'))
-    .catch(err => console.error('MongoDB connection error:', err.message || err));
+  mongoose
+    .connect(mongoUri)
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch((err) => console.log("❌ MongoDB Error:", err.message));
 } else {
-  console.warn('No MongoDB URI or host configured. Backend will run without database connectivity.');
+  console.log("⚠️ No MongoDB URI found");
 }
 
-// Routes / Endpoints
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+// Routes
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
-app.get('/api/products', (req, res) => {
-  res.json({ products: [] });
+app.get("/api/products", (req, res) => {
+  res.json({
+    products: [
+      { id: 1, name: "Laptop" },
+      { id: 2, name: "Phone" },
+      { id: 3, name: "Headphones" }
+    ]
+  });
 });
 
-app.get('/api', (req, res) => {
-  res.json({ message: 'API is running' });
+app.get("/api", (req, res) => {
+  res.json({ message: "API Running Successfully" });
 });
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
